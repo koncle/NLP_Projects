@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="NLP_Projects" target="1.5" />
+      <module name="NLP_Projects" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>
