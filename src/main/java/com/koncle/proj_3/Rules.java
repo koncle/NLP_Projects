@@ -20,20 +20,23 @@ public class Rules {
             {Attribute.V, Attribute.NP}
     };
 
-    private static List<Rule> rules = new ArrayList<Rule>();
+    private static List<Edge> rules = new ArrayList<>();
 
     static {
         for (int i = 0; i < startAttributes.length; ++i){
-            Rule rule = new Rule(startAttributes[i], rightAttributes[i]);
-            rules.add(rule);
+            List<Edge> rightEdges = new ArrayList<>();
+            for (int j = 0; j < rightAttributes[i].length; ++j){
+                rightEdges.add(new Edge(-1, -1, rightAttributes[i][j], null));
+            }
+            rules.add(new Edge(-1, -1, startAttributes[i], rightEdges));
         }
     }
 
-    public static List<Rule> getRulesByWord(Word word){
+    public static List<Edge> getRulesByWord(Word word){
         Attribute rightFirstAttr = word.getAttr();
-        List<Rule> ret = new ArrayList<Rule>();
-        for (Rule rule : rules){
-            if (rule.firstAttr() == rightFirstAttr){
+        List<Edge> ret = new ArrayList<>();
+        for (Edge rule : rules){
+            if (rule.getLeftAttribute() == rightFirstAttr){
                 ret.add(rule);
             }
         }

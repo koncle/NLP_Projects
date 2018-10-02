@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChartParsing {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private List<Edge> activeEdges = new ArrayList<Edge>();
     private List<Edge> inactiveEdges = new ArrayList<Edge>();
@@ -20,24 +20,25 @@ public class ChartParsing {
             // get a new element
             Word word = agenda.next();
             // get corresponding rules
-            List<Rule> rules = Rules.getRulesByWord(word);
+            List<Edge> rules = Rules.getRulesByWord(word);
             // add active edges
             if(rules.size() != 0){
-                for (Rule rule : rules){
-                    if (rule.getRightAttributes().size() > 1) {
-                        Edge edge = new Edge(word.getStart(), word.getEnd(), rule, true);
+                for (Edge rule : rules){
+                    if (rule.getRightExpressionSize() > 1) {
+                        Edge edge = new Edge(word.getStart(), word.getEnd(), rule.getAttr(), rule.getRightExpression(), true);
+                        edge.getRightExpression().set(0, word.getAppendedInfo());
                         tmpActiveEdges.add(edge);
                     }else{
-                        Attribute leftAttr = rule.getLeftAttribute();
+                        Attribute leftAttr = rule.getAttr();
                         Word nextWord = new Word(leftAttr.getName(), leftAttr, word.getStart(), word.getEnd());
+                        nextWord.setAppendedInfo(rule);
                         agenda.add(nextWord);
                     }
                 }
             }
 
             //create  a new rule for inactive edge with right attributes = null
-            Rule inactiveRule = new Rule(word.getAttr(), null);
-            Edge inactiveEdge = new Edge(word.getStart(), word.getEnd(), inactiveRule, false);
+            Edge inactiveEdge = new Edge(word.getStart(), word.getEnd(), word.getAttr(), word.getAppendedInfo().getRightExpression(), false);
             // add inactive edges
             inactiveEdges.add(inactiveEdge);
 
@@ -45,10 +46,14 @@ public class ChartParsing {
             for(Edge edge : activeEdges){
                 if (edge.match(inactiveEdge)){
                     if (edge.isNearEnd()){
-                        Attribute leftAttribute = edge.getLeftAttribute();
-                        agenda.add(new Word(leftAttribute.getName(), leftAttribute, edge.getStartPos(), edge.getEndPos()+1));
+                        Attribute leftAttribute = edge.getAttr();
+                        Word tmpWord = new Word(leftAttribute.getName(), leftAttribute, edge.getStartPos(), edge.getEndPos()+1);
+                        Edge copyEdge = edge.copy();
+                        copyEdge.getRightExpression().set(copyEdge.getIndex(), word.getAppendedInfo());
+                        tmpWord.setAppendedInfo(edge);
+                        agenda.add(tmpWord);
                     }else {
-                        Edge newActive = edge.expand();
+                        Edge newActive = edge.expand(inactiveEdge);
                         activeEdges.add(newActive);
                     }
                 }
@@ -61,8 +66,9 @@ public class ChartParsing {
                 Utils.println("");
             }
         }
-        if(inactiveEdges.get(inactiveEdges.size()-1).getLeftAttribute() == Attribute.S){
+        if(inactiveEdges.get(inactiveEdges.size()-1).getAttr() == Attribute.S){
             Utils.println("Right syntax");
+            inactiveEdges.get(inactiveEdges.size()-1).printSyntaxTree();
         }
     }
 

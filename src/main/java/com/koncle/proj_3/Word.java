@@ -5,12 +5,14 @@ public class Word {
     private Attribute attr;
     private int start;
     private int end;
+    private Edge appendedInfo = null;
 
     public Word(String word, Attribute attr, int start, int end){
         this.word = word;
         this.attr = attr;
         this.start = start;
         this.end = end;
+        this.appendedInfo = new Edge(-1, -1, attr, null);
     }
 
     public String getWord() {
@@ -43,5 +45,13 @@ public class Word {
 
     public void setEnd(int end) {
         this.end = end;
+    }
+
+    public Edge getAppendedInfo() {
+        return appendedInfo;
+    }
+
+    public void setAppendedInfo(Edge appendedInfo) {
+        this.appendedInfo = appendedInfo;
     }
 }
