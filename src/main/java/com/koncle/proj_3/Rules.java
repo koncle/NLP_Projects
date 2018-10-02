@@ -32,7 +32,7 @@ public class Rules {
         }
     }
 
-    public static List<Edge> getRulesByWord(Word word){
+    public static List<Edge> getRulesByWord(Edge word){
         Attribute rightFirstAttr = word.getAttr();
         List<Edge> ret = new ArrayList<>();
         for (Edge rule : rules){

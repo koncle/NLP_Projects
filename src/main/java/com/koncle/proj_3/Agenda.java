@@ -9,7 +9,7 @@ import java.util.Stack;
 public class Agenda {
     private String[] input;
     private int index = 0;
-    Stack<Word> wordStack = new Stack<Word>();
+    Stack<Edge> wordStack = new Stack<>();
 
     public Agenda(){
         getInput();
@@ -29,11 +29,13 @@ public class Agenda {
         return wordStack.isEmpty() && this.index == this.input.length;
     }
 
-    public Word next(){
+    public Edge next(){
         if (wordStack.isEmpty()){
             String w = input[index++];
             Attribute attr = getAttribute(w);
-            Word word = new Word(w, attr, index-1, index);
+            // use edge class to represent word, so that it can put more
+            // info to preserve tree structure.
+            Edge word = new Edge(index-1, index, attr, null);
             this.wordStack.push(word);
         }
         return this.wordStack.pop();
@@ -66,7 +68,7 @@ public class Agenda {
         return attr;
     }
 
-    public void add(Word word) {
+    public void add(Edge word) {
         this.wordStack.push(word);
     }
 

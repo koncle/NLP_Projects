@@ -2,7 +2,8 @@ package com.koncle.proj_3;
 
 import com.koncle.Utils;
 
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Edge {
     private int start;
@@ -25,30 +26,6 @@ public class Edge {
         this(start, end, attr, rightExpression, false);
     }
 
-    public int getStartPos() {
-        return start;
-    }
-
-    public Boolean isActive() {
-        return this.active;
-    }
-
-    public int getEndPos() {
-        return this.end;
-    }
-
-    public Attribute getAttr() {
-        return this.attr;
-    }
-
-    public int getIndex(){
-        return index;
-    }
-
-    public int getRightExpressionSize() {
-        return this.rightExpression == null ? 0 : this.rightExpression.size();
-    }
-
     public List<Edge> getRightExpression() {
         return this.rightExpression;
     }
@@ -57,13 +34,16 @@ public class Edge {
         if (rightExpression == null || rightExpression.size() == 0) {
             return attr;
         } else {
-            // return rightExpression.get(0).getLeftAttribute();
             return rightExpression.get(0).getAttr();
         }
     }
 
+    /**
+     * @param inactiveEdge next inactive edge to be matched
+     * @return if this active edge can match next inactive edge
+     */
     public boolean match(Edge inactiveEdge) {
-        if (!inactiveEdge.isActive()) {
+        if (this.isActive() && !inactiveEdge.isActive()) {
             if (this.end == inactiveEdge.start &&
                     this.rightExpression.get(index).getAttr() == inactiveEdge.getAttr()) {
                 return true;
@@ -75,13 +55,21 @@ public class Edge {
         return false;
     }
 
+    /**
+     * @return boolean if this edge is reaching end : S->X1.X2
+     */
     public boolean isNearEnd() {
         return index + 1 == this.rightExpression.size();
     }
 
+    /**
+     * @param inactiveEdge the inactive edge to be expanded
+     * @return an expanded edge which preserve the tree structure
+     */
     public Edge expand(Edge inactiveEdge) {
         // move the index to next
         Edge expendedEdge =  new Edge(this.start, this.end + 1, this.attr, this.rightExpression, true);
+        // add tree info to new edge
         expendedEdge.getRightExpression().set(expendedEdge.getIndex()-1, inactiveEdge);
         return expendedEdge;
     }
@@ -109,6 +97,37 @@ public class Edge {
     }
 
     public Edge copy(){
-        return new Edge(this.start, this.end, this.attr, this.rightExpression, this.active);
+        List<Edge> newList = new ArrayList<>();
+        newList.addAll(this.rightExpression);
+        return new Edge(this.start, this.end, this.attr, newList, this.active);
+    }
+
+
+    public int getStart() {
+        return start;
+    }
+
+    public Boolean isActive() {
+        return this.active;
+    }
+
+    public int getEnd() {
+        return this.end;
+    }
+
+    public void setEnd(int end){
+        this.end = end;
+    }
+
+    public Attribute getAttr() {
+        return this.attr;
+    }
+
+    public int getIndex(){
+        return index;
+    }
+
+    public int getRightExpressionSize() {
+        return this.rightExpression == null ? 0 : this.rightExpression.size();
     }
 }
